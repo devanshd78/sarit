@@ -1,8 +1,14 @@
-// src/components/SortMenu.tsx
 "use client";
 
 import { FC } from "react";
-import ReactSelect, { StylesConfig } from "react-select";
+import dynamic from "next/dynamic";
+import type { Props as SelectProps, StylesConfig } from "react-select";
+
+// Dynamically import ReactSelect with proper generic types to avoid SSR mismatches
+const ReactSelect = dynamic<SelectProps<Option, false>>(
+  () => import("react-select").then((mod) => mod.default),
+  { ssr: false }
+);
 
 type Option = { value: string; label: string };
 
@@ -24,34 +30,24 @@ const selectStyles: StylesConfig<Option, false> = {
     minHeight: 38,
     padding: "2px 4px",
   }),
-  singleValue: (provided) => ({
-    ...provided,
-    color: "#000",
-  }),
-  placeholder: (provided) => ({
-    ...provided,
-    color: "#6b7280",
-  }),
-  menu: (provided) => ({
-    ...provided,
-    borderRadius: 6,
-    overflow: "hidden",
-  }),
+  singleValue: (provided) => ({ ...provided, color: "#000" }),
+  placeholder: (provided) => ({ ...provided, color: "#6b7280" }),
+  menu: (provided) => ({ ...provided, borderRadius: 6, overflow: "hidden" }),
   option: (provided, state) => ({
     ...provided,
     backgroundColor: state.isFocused ? "#f3f4f6" : "#fff",
     color: "#000",
     cursor: "pointer",
   }),
-  dropdownIndicator: (provided) => ({
-    ...provided,
-    color: "#6b7280",
-    padding: 4,
-  }),
+  dropdownIndicator: (provided) => ({ ...provided, color: "#6b7280", padding: 4 }),
   indicatorSeparator: () => ({ display: "none" }),
 };
 
-export const SortMenu: FC<{ total: number }> = ({ total }) => (
+interface SortMenuProps {
+  total: number;
+}
+
+export const SortMenu: FC<SortMenuProps> = ({ total }) => (
   <div className="flex items-center space-x-3 text-sm text-black">
     <span className="font-medium">Sort by:</span>
 

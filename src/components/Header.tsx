@@ -14,6 +14,7 @@ import {
   User,
   ShoppingBag,
 } from "lucide-react";
+import { useCart } from "./context/CartContext";
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -27,6 +28,7 @@ const navItems = [
 export default function Header() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
+  const { totalCount } = useCart();
 
   return (
     <header className="fixed top-0 left-0 w-full z-50">
@@ -74,9 +76,8 @@ export default function Header() {
           </nav>
         </div>
 
-        {/* Right side: country, icons */}
+        {/* Right side: icons */}
         <div className="flex items-center space-x-6">
-
           <button
             className="cursor-pointer"
             aria-label="Search"
@@ -85,7 +86,6 @@ export default function Header() {
             <Search size={20} className="text-white hover:text-gray-300" />
           </button>
 
-          {/* Account icon now navigates via router */}
           <button
             className="cursor-pointer"
             aria-label="Account"
@@ -95,21 +95,25 @@ export default function Header() {
           </button>
 
           <button
-            className="cursor-pointer"
+            className="relative cursor-pointer"
             aria-label="Cart"
-            onClick={() => {}}
+            onClick={() => router.push("/cart")}
           >
             <ShoppingBag
               size={20}
               className="text-white hover:text-gray-300"
             />
+            {totalCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {totalCount}
+              </span>
+            )}
           </button>
         </div>
       </div>
 
       {/* Mobile Nav */}
       <div className="flex md:hidden items-center justify-between bg-black px-4 py-3">
-        {/* Hamburger */}
         <button
           className="cursor-pointer"
           onClick={() => setSidebarOpen(true)}
@@ -118,7 +122,6 @@ export default function Header() {
           <Menu size={24} className="text-white" />
         </button>
 
-        {/* Center logo */}
         <Link href="/" className="inline-block">
           <Image
             src="/assets/sarit-logo-white.svg"
@@ -128,13 +131,21 @@ export default function Header() {
           />
         </Link>
 
-        {/* Right icons */}
         <div className="flex items-center space-x-4">
-          <button className="cursor-pointer" aria-label="Search" onClick={() => {}}>
+          <button className="cursor-pointer" onClick={() => {}} aria-label="Search">
             <Search size={20} className="text-white" />
           </button>
-          <button className="cursor-pointer" aria-label="Cart" onClick={() => {}}>
+          <button
+            className="relative cursor-pointer"
+            aria-label="Cart"
+            onClick={() => router.push("/cart")}
+          >
             <ShoppingBag size={20} className="text-white" />
+            {totalCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                {totalCount}
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -152,7 +163,6 @@ export default function Header() {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* Mobile header inside sidebar */}
         <div className="flex items-center justify-between p-4 border-b">
           <button
             className="cursor-pointer"
@@ -169,10 +179,9 @@ export default function Header() {
               height={32}
             />
           </Link>
-          <div className="w-6" /> {/* spacer */}
+          <div className="w-6" />
         </div>
 
-        {/* Nav links */}
         <nav className="flex flex-col p-6 space-y-4 text-gray-800">
           {navItems.map((item) => (
             <Link
@@ -186,9 +195,7 @@ export default function Header() {
           ))}
         </nav>
 
-        {/* Bottom mobile footer */}
         <div className="mt-auto border-t p-6 space-y-4">
-          {/* Login button now uses router.push */}
           <button
             className="flex items-center space-x-2 text-gray-800 cursor-pointer"
             onClick={() => {
@@ -198,31 +205,12 @@ export default function Header() {
           >
             <User size={20} /> <span>Log in</span>
           </button>
-
           <div className="flex space-x-4">
-            <Link
-              href="https://facebook.com"
-              target="_blank"
-              aria-label="Facebook"
-              className="text-gray-800 cursor-pointer"
-            >
-              <img
-                src="/assets/icons/facebook.svg"
-                alt="Facebook"
-                className="w-5 h-5"
-              />
+            <Link href="https://facebook.com" target="_blank" aria-label="Facebook">
+              <img src="/assets/icons/facebook.svg" alt="Facebook" className="w-5 h-5" />
             </Link>
-            <Link
-              href="https://instagram.com"
-              target="_blank"
-              aria-label="Instagram"
-              className="text-gray-800 cursor-pointer"
-            >
-              <img
-                src="/assets/icons/instagram.svg"
-                alt="Instagram"
-                className="w-5 h-5"
-              />
+            <Link href="https://instagram.com" target="_blank" aria-label="Instagram">
+              <img src="/assets/icons/instagram.svg" alt="Instagram" className="w-5 h-5" />
             </Link>
           </div>
         </div>
