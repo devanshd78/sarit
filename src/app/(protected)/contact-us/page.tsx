@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
+import api, { post } from "@/lib/api"; // Ensure your api lib is correctly imported
 
 type FormState = {
   name: string;
@@ -24,6 +25,7 @@ export default function ContactPage() {
     comment: "",
   });
   const [errors, setErrors] = useState<Partial<FormState>>({});
+  const [loading, setLoading] = useState(false);
 
   const validate = () => {
     const errs: Partial<FormState> = {};
@@ -43,21 +45,54 @@ export default function ContactPage() {
     setErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
-    // TODO: send form data to your API
-    Swal.fire({
-      icon: "success",
-      title: "Message Sent",
-      text: "We’ve received your message and will be in touch soon.",
-      confirmButtonText: "OK",
-      background: "#fff",
-      confirmButtonColor: "#000",
-    });
+    setLoading(true);
+    try {
+      const response = await post("/contact/submit", form);
 
-    setForm({ name: "", email: "", phone: "", comment: "" });
+      if (response.message === "Contact message submitted successfully.") {
+        Swal.fire({
+          icon: "success",
+          title: "Message Sent",
+          text: "We’ve received your message and will be in touch soon.",
+          timer: 1500,
+          timerProgressBar: true,
+          showConfirmButton: false,
+          background: "#fff",
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+        setForm({ name: "", email: "", phone: "", comment: "" });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: "Something went wrong. Please try again later.",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (error: any) {
+      if (error.response?.data?.errors) {
+        const fieldErrors: Partial<FormState> = {};
+        for (const err of error.response.data.errors) {
+          fieldErrors[err.field as keyof FormState] = err.msg;
+        }
+        setErrors(fieldErrors);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.response?.data?.message || "Unable to send message.",
+          confirmButtonText: "OK",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -180,10 +215,11 @@ export default function ContactPage() {
             {/* Submit */}
             <Button
               type="submit"
+              disabled={loading}
               className="w-full flex items-center justify-center space-x-2 bg-black hover:bg-gray-800 text-white"
             >
-              <Send className="w-5 h-5" />
-              <span>Send Message</span>
+              <Send className={`w-5 h-5 ${loading ? "animate-spin" : ""}`} />
+              <span>{loading ? "Sending..." : "Send Message"}</span>
             </Button>
           </form>
         </CardContent>

@@ -3,22 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Home,
-  Layout as LayoutIcon,
-  ShoppingBag,
-  Clock,
-  ChevronDown,
-  ChevronRight,
-  Menu,
-  X,
-} from "lucide-react";
+import { Home, Users, LayoutDashboard, ShoppingBag, Clock, User2, FileText, Settings, BarChart, HelpCircle, ChevronDown, ChevronRight, Menu, X, Tag } from "lucide-react";
 
 const sections = [
   { label: "Dashboard", href: "/admin", icon: Home },
+  { label: "User Data", href: "/admin/user-list", icon: Users },
   {
     label: "Front Page",
-    icon: LayoutIcon,
+    icon: LayoutDashboard,
     submenu: [
       { label: "Testimonials", href: "/admin/front-page/testimonials" },
       { label: "Slides", href: "/admin/front-page/slides" },
@@ -27,6 +19,10 @@ const sections = [
   },
   { label: "Bag Data", href: "/admin/bag-collection", icon: ShoppingBag },
   { label: "Order History", href: "/admin/orders", icon: Clock },
+  { label: "Coupon Code", href: "/admin/coupon-code", icon: Tag },
+  { label: "Contact Us", href: "/admin/contact-us", icon: User2 },
+  { label: "Settings", href: "/admin/settings", icon: Settings },
+  { label: "Help Center", href: "/admin/help", icon: HelpCircle },
 ];
 
 export default function AdminSidebar() {
