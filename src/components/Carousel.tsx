@@ -1,96 +1,45 @@
-// src/components/HeroCarousel.tsx
-"use client";
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Autoplay } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import { get } from "@/lib/api";
+const Hero: React.FC = () => {
+  return (
+    <section className="relative w-full h-screen md:h-[85vh] lg:h-[75vh] overflow-hidden">
+      {/* Background Image from Pexels */}
+      <Image
+        src="https://images.pexels.com/photos/4887255/pexels-photo-4887255.jpeg"
+        alt="Collection of stylish bags"
+        fill
+        className="object-cover"
+        unoptimized
+        priority
+      />
+      {/* <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div> */}
 
-export type SlideType = {
-  _id: string;
-  title: string;
-  subtitle?: string;
-  ctaHref?: string;
-  ctaText?: string;
-  image: string;           // data URI
+      {/* Content */}
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-white mb-4 tracking-tight">
+          Carry Confidence
+        </h1>
+        <p className="max-w-xl text-base sm:text-lg md:text-xl text-gray-200 mb-8 tracking-wide">
+          Premium School & Everyday Bags Designed for You
+        </p>
+        <Link
+          href="/collections/all"
+          className="group inline-flex items-center bg-white text-black px-8 py-3 text-lg font-medium rounded-full tracking-wide transition-all duration-300 hover:bg-transparent hover:text-white border-2 border-white"
+        >
+          Shop Now
+          <ArrowRight className="ml-2 w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+        </Link>
+      </div>
+
+      {/* Scroll Indicator */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <ChevronDown className="w-6 h-6 text-white opacity-75" />
+      </div>
+    </section>
+  );
 };
 
-export default function HeroCarousel() {
-  const [slides, setSlides] = useState<SlideType[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchSlides() {
-      try {
-        const res = await get<{ success: boolean; items: SlideType[] }>(
-          "/slides/getlist"
-        );
-        if (res.success) {
-          setSlides(res.items);
-        }
-      } catch (err) {
-        console.error("Error loading slides:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchSlides();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="w-full h-[500px] flex items-center justify-center bg-gray-100">
-        <span className="text-gray-500">Loading slides…</span>
-      </div>
-    );
-  }
-
-  if (!slides.length) {
-    return null;
-  }
-
-  return (
-    <div className="relative w-full">
-      <Swiper
-        modules={[Navigation, Autoplay]}
-        navigation
-        autoplay={{ delay: 5000, disableOnInteraction: false }}
-        loop
-        className="h-[500px]"
-      >
-        {slides.map((slide) => (
-          <SwiperSlide key={slide._id}>
-            <div className="relative w-full h-full">
-              <Image
-                src={slide.image}
-                alt={slide.title}
-                fill
-                unoptimized
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-center px-4">
-                <h2 className="text-4xl font-bold text-white mb-2">
-                  {slide.title}
-                </h2>
-                {slide.subtitle && (
-                  <p className="text-lg text-white mb-4">{slide.subtitle}</p>
-                )}
-                {slide.ctaHref && slide.ctaText && (
-                  <a
-                    href={slide.ctaHref}
-                    className="bg-white text-black px-4 py-2 rounded-md hover:bg-gray-100 transition"
-                  >
-                    {slide.ctaText}
-                  </a>
-                )}
-              </div>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </div>
-  );
-}
+export default Hero;

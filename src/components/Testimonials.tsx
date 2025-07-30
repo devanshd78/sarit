@@ -1,65 +1,97 @@
 // src/components/Testimonials.tsx
 "use client";
 
-import { FC } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import api from "@/lib/api";
+import { Progress } from "@/components/ui/progress";
 
-
-export type Testimonial = {
+interface Testimonial {
+  _id: string;
   quote: string;
   author: string;
-};
+}
 
+const Testimonials: React.FC = () => {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-const Testimonials: FC<{ items: Testimonial[] }> = ({ items }) => {
+  const fetchTestimonials = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await api.get<{ success: boolean; items: Testimonial[] }>(
+        "/testimonials/getList"
+      );
+      if (res.data.success) {
+        setTestimonials(res.data.items);
+      } else {
+        setError("Failed to load testimonials.");
+      }
+    } catch (err) {
+      console.error("Error fetching testimonials:", err);
+      setError("Server error loading testimonials.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTestimonials();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <Progress className="w-32 h-1 mx-auto" />
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <p className="text-red-500">{error}</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <div className="relative w-full py-8">
-      {/* Prev / Next buttons */}
-      <button
-        className="swiper-button-prev-custom absolute left-0 top-1/2 z-10 -translate-y-1/2 p-2 bg-white rounded-full shadow hover:bg-gray-100"
-        aria-label="Previous testimonial"
-      >
-        <ChevronLeft size={20} />
-      </button>
-      <button
-        className="swiper-button-next-custom absolute right-0 top-1/2 z-10 -translate-y-1/2 p-2 bg-white rounded-full shadow hover:bg-gray-100"
-        aria-label="Next testimonial"
-      >
-        <ChevronRight size={20} />
-      </button>
+    <section className="py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold font-serif mb-4">
+            What They Say
+          </h2>
+          <p className="text-gray-600 text-lg">
+            Real experiences from real customers
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {testimonials.map((t, idx) => {
+            // alternate bg/text for zebra effect
+            const isDark = idx % 2 === 0;
+            const bgClass = isDark ? "bg-black" : "bg-white border-2 border-black";
+            const textClass = isDark ? "text-white" : "text-black";
 
-      <Swiper
-        modules={[Navigation]}
-        navigation={{
-          prevEl: ".swiper-button-prev-custom",
-          nextEl: ".swiper-button-next-custom",
-        }}
-        spaceBetween={24}
-        slidesPerView={1}
-        breakpoints={{
-          640: { slidesPerView: 1.2 },
-          768: { slidesPerView: 1.5 },
-          1024: { slidesPerView: 2 },
-        }}
-      >
-        {items.map((t, i) => (
-          <SwiperSlide key={i}>
-            <blockquote className="h-full flex flex-col justify-between p-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
-              <p className="text-gray-800 italic text-lg mb-4 flex-grow">
-                “{t.quote}”
-              </p>
-              <footer className="text-sm font-semibold text-black mt-4">
-                — {t.author}
-              </footer>
-            </blockquote>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </div>
+            return (
+              <div key={t._id} className={`p-8 ${bgClass} ${textClass}`}>
+                <p className="text-lg font-serif italic mb-6 leading-relaxed">
+                  “{t.quote}”
+                </p>
+                <p className="font-semibold tracking-wider text-sm uppercase">
+                  {t.author}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 };
 

@@ -3,26 +3,38 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Users, LayoutDashboard, ShoppingBag, Clock, User2, FileText, Settings, BarChart, HelpCircle, ChevronDown, ChevronRight, Menu, X, Tag } from "lucide-react";
+import { Home, Users, LayoutDashboard, ShoppingBag, Clock, User2, Settings, HelpCircle, ChevronDown, ChevronRight, Menu, X, Tag, ShoppingCart, Mail } from "lucide-react";
 
 const sections = [
-  { label: "Dashboard", href: "/admin", icon: Home },
-  { label: "User Data", href: "/admin/user-list", icon: Users },
+  // Primary dashboard and order management
+  { label: 'Dashboard', href: '/admin/dashboard', icon: Home },
+  { label: 'New Order', href: '/admin/new-order', icon: ShoppingCart },
+  { label: 'Order History', href: '/admin/order-history', icon: Clock },
+
+  // Product and user data
+  { label: 'Bag Data', href: '/admin/bag-collection', icon: ShoppingBag },
+  { label: 'User Data', href: '/admin/user-list', icon: Users },
+
+  // Promotions and communications
+  { label: 'Coupon Code', href: '/admin/coupon-code', icon: Tag },
+  { label: 'Newsletter', href: '/admin/newsletter', icon: Mail },
+
+  // Front page configuration
   {
-    label: "Front Page",
+    label: 'Front Page',
     icon: LayoutDashboard,
     submenu: [
-      { label: "Testimonials", href: "/admin/front-page/testimonials" },
-      { label: "Slides", href: "/admin/front-page/slides" },
-      { label: "Collections", href: "/admin/front-page/collections" },
+      { label: 'Slides', href: '/admin/front-page/slides' },
+      // { label: 'Collections', href: '/admin/front-page/collections' },
+      { label: 'Best Sellers', href: '/admin/front-page/best-sellers' },
+      { label: 'Testimonials', href: '/admin/front-page/testimonials' },
     ],
   },
-  { label: "Bag Data", href: "/admin/bag-collection", icon: ShoppingBag },
-  { label: "Order History", href: "/admin/orders", icon: Clock },
-  { label: "Coupon Code", href: "/admin/coupon-code", icon: Tag },
-  { label: "Contact Us", href: "/admin/contact-us", icon: User2 },
-  { label: "Settings", href: "/admin/settings", icon: Settings },
-  { label: "Help Center", href: "/admin/help", icon: HelpCircle },
+
+  // Support and settings
+  { label: 'Contact Us', href: '/admin/contact-us', icon: User2 },
+  { label: 'Settings', href: '/admin/settings', icon: Settings },
+  { label: 'Help Center', href: '/admin/help', icon: HelpCircle },
 ];
 
 export default function AdminSidebar() {
@@ -106,7 +118,7 @@ export default function AdminSidebar() {
   return (
     <>
       {/* mobile header */}
-      <header className="md:hidden fixed inset-x-0 top-0 z-40 flex h-14 items-center bg-blue-600 px-4 text-white shadow">
+      <header className="md:hidden fixed inset-x-0 top-0 z-40 flex h-14 items-center bg-gray-900 text-gray-100 shadow-lg px-4">
         <button onClick={() => setOpen(true)} className="p-1">
           <Menu className="w-6 h-6" />
         </button>

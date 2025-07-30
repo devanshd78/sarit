@@ -34,6 +34,7 @@ type BagColl = {
   deliveryCharge: number;
   rating: number;
   reviews: number;
+  isBestSeller:boolean;
   dimensions: {
     width: number;
     height: number;
@@ -191,6 +192,7 @@ export default function AdminBagCollectionsPage() {
                 <TableHead>Reviews</TableHead>
                 <TableHead>Delivery</TableHead>
                 <TableHead>Rating</TableHead>
+                <TableHead>Best Sellers</TableHead>
                 <TableHead>Dimensions</TableHead>
                 <TableHead>Weight</TableHead>
                 <TableHead>Material</TableHead>
@@ -233,6 +235,7 @@ export default function AdminBagCollectionsPage() {
                     <TableCell>{c.reviews}</TableCell>
                     <TableCell>₹{c.deliveryCharge.toFixed(0)}</TableCell>
                     <TableCell>{c.rating.toFixed(1)}</TableCell>
+                    <TableCell>{c.isBestSeller ? 'Yes' : "No"}</TableCell>
                     <TableCell>
                       {`${c.dimensions.width}×${c.dimensions.height}×${c.dimensions.depth} ${c.dimensions.unit}`}
                     </TableCell>

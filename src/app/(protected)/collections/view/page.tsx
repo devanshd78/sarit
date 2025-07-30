@@ -91,9 +91,7 @@ const ProductViewPage: FC = () => {
   const fullStars = Math.floor(product.rating);
   const halfStar = product.rating - fullStars >= 0.5;
 
-  const handleAddToCart = () => {
-    console.log(quantity);
-    
+  const handleAddToCart = () => {    
     addItem({ ...product, quantity });
     setAdded(true);
   };

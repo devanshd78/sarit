@@ -131,7 +131,7 @@ export default function AdminTestimonialsPage() {
           <DialogTrigger asChild>
             <Button variant="outline">Add Testimonial</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md bg-white">
             <DialogHeader>
               <DialogTitle>Add New Testimonial</DialogTitle>
             </DialogHeader>
@@ -158,7 +158,7 @@ export default function AdminTestimonialsPage() {
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button onClick={handleAdd} disabled={submitting}>
+              <Button className="bg-black text-white" onClick={handleAdd} disabled={submitting}>
                 {submitting ? "Saving…" : "Save"}
               </Button>
             </DialogFooter>

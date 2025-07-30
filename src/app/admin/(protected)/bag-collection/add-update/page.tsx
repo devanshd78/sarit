@@ -37,6 +37,7 @@ export default function AddUpdateBagCollection() {
   const [deliveryCharge, setDeliveryCharge] = useState("");
   const [rating, setRating] = useState("");
   const [reviews, setReviews] = useState("");
+  const [isBestSeller, setIsBestSeller] = useState(false);
   // dimensions
   const [width, setWidth] = useState("");
   const [height, setHeight] = useState("");
@@ -77,6 +78,7 @@ export default function AddUpdateBagCollection() {
           setDeliveryCharge(c.deliveryCharge.toString());
           setRating(c.rating.toString());
           setReviews(c.reviews.toString());
+          setIsBestSeller(c.isBestSeller || false);
           setWidth(c.dimensions?.width?.toString() || "");
           setHeight(c.dimensions?.height?.toString() || "");
           setDepth(c.dimensions?.depth?.toString() || "");
@@ -117,7 +119,7 @@ export default function AddUpdateBagCollection() {
     fd.append("deliveryCharge", deliveryCharge);
     fd.append("rating", rating);
     fd.append("reviews", reviews);
-
+    fd.append("isBestSeller", String(isBestSeller));
     // pack dimensions & weight as JSON strings
     const dims = { width, height, depth, unit: dimUnit };
     fd.append("dimensions", JSON.stringify(dims));
@@ -165,7 +167,7 @@ export default function AddUpdateBagCollection() {
         </h1>
       </div>
 
-      <form onSubmit={save} className="space-y-6 bg-white p-6 rounded-lg shadow-md">
+      <div className="space-y-6 bg-white p-6 rounded-lg shadow-md">
         {/* Basic */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <label>
@@ -242,9 +244,9 @@ export default function AddUpdateBagCollection() {
           </label>
           <label>
             <span className="text-sm font-medium">Collection Type</span>
-            <Select value={type.toString()} onValueChange={v => setType(Number(v) as 1|2)}>
+            <Select value={type.toString()} onValueChange={v => setType(Number(v) as 1 | 2)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 <SelectItem value="1">New Arrivals</SelectItem>
                 <SelectItem value="2">Kids Collections</SelectItem>
               </SelectContent>
@@ -272,6 +274,19 @@ export default function AddUpdateBagCollection() {
             />
           </label>
         </div>
+
+          <div className="flex items-center mt-6">
+            <input
+              id="bestSeller"
+              type="checkbox"
+              checked={isBestSeller}
+              onChange={(e) => setIsBestSeller(e.target.checked)}
+              className="h-4 w-4"
+            />
+            <label htmlFor="bestSeller" className="ml-2 text-sm">
+              Best Seller
+            </label>
+          </div>
 
         {/* Dimensions */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
@@ -361,11 +376,11 @@ export default function AddUpdateBagCollection() {
           <Button variant="outline" onClick={() => router.back()}>
             Cancel
           </Button>
-          <Button type="submit" disabled={saving}>
+          <Button onClick={save} disabled={saving}>
             {saving ? "Saving…" : isEditing ? "Update" : "Create"}
           </Button>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
