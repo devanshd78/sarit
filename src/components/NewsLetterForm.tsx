@@ -9,8 +9,8 @@ import { ArrowRight } from "lucide-react";
 import { post } from "@/lib/api";
 
 export default function NewsletterPage() {
-  const [email, setEmail]     = useState("");
-  const [error, setError]     = useState("");
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const validateEmail = (value: string) =>
@@ -42,9 +42,13 @@ export default function NewsletterPage() {
             title: "text-2xl font-semibold mb-2",
             htmlContainer: "text-gray-800",
           },
+          timer: 1500,
+          timerProgressBar: true,
+          showConfirmButton: false,
         });
         setEmail("");
       }
+
     } catch {
       setError("Network error. Please try again later.");
     } finally {

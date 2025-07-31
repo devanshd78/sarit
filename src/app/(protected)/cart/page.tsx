@@ -45,7 +45,7 @@ const CartPage: FC = () => {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh]">
         <h2 className="text-3xl font-semibold mb-4">Your cart is empty</h2>
-        <Link href="/catalog" className="text-sareet-primary hover:underline text-lg">
+        <Link href="/collections/all" className="text-sareet-primary hover:underline text-lg">
           Continue shopping
         </Link>
       </div>
