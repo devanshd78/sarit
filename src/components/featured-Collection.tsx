@@ -1,70 +1,234 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Loader2 } from 'lucide-react';
 
-const FeaturedCollections: React.FC = () => {
-  const collections = [
+// TypeScript interfaces for type safety
+interface Collection {
+  id: string;
+  title: string;
+  tagline: string;
+  image: string;
+  href: string;
+  priority?: boolean;
+}
+
+interface FeaturedCollectionsProps {
+  className?: string;
+}
+
+// Loading skeleton component
+const CollectionSkeleton: React.FC = () => (
+  <div className="border-2 border-gray-200 bg-white rounded-2xl overflow-hidden animate-pulse">
+    <div className="p-6 md:p-8">
+      <div className="aspect-square mb-6 bg-gray-200 rounded-xl"></div>
+      <div className="h-8 bg-gray-200 rounded mb-3"></div>
+      <div className="h-4 bg-gray-200 rounded mb-6 w-3/4"></div>
+      <div className="h-6 bg-gray-200 rounded w-24"></div>
+    </div>
+  </div>
+);
+
+// Error fallback component
+const CollectionError: React.FC<{ onRetry?: () => void }> = ({ onRetry }) => (
+  <div className="border-2 border-red-200 bg-red-50 rounded-2xl p-6 md:p-8 text-center">
+    <div className="text-red-600 mb-4">
+      <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+      </svg>
+    </div>
+    <h3 className="text-lg font-semibold text-red-800 mb-2">Failed to load collection</h3>
+    <p className="text-red-600 text-sm mb-4">Please try again later</p>
+    {onRetry && (
+      <button
+        onClick={onRetry}
+        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
+      >
+        Retry
+      </button>
+    )}
+  </div>
+);
+
+// Individual collection card component
+const CollectionCard: React.FC<{
+  collection: Collection;
+  index: number;
+  onImageError: (id: string) => void;
+}> = ({ collection, index, onImageError }) => {
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoading(false);
+    onImageError(collection.id);
+  };
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
+  };
+
+  if (imageError) {
+    return <CollectionError />;
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      whileHover={{ y: -8 }}
+      className="group"
+    >
+      <Link
+        href={collection.href}
+        className="block border-2 border-black bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-black/20 focus:border-gray-600"
+        aria-label={`Explore ${collection.title} collection - ${collection.tagline}`}
+      >
+        <div className="p-6 md:p-8">
+          {/* Image Container with Loading State */}
+          <div className="relative aspect-square mb-6 overflow-hidden rounded-xl bg-gray-100">
+            <AnimatePresence>
+              {imageLoading && (
+                <motion.div
+                  initial={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 flex items-center justify-center bg-gray-100"
+                >
+                  <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <Image
+              src={collection.image}
+              alt={`${collection.title} collection featuring ${collection.tagline.toLowerCase()}`}
+              fill
+              className={`object-cover transition-all duration-700 ease-out group-hover:scale-110 ${imageLoading ? 'opacity-0' : 'opacity-100'
+                }`}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={collection.priority}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+            />
+
+            {/* Overlay gradient for better text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          </div>
+
+          {/* Content */}
+          <div className="space-y-3">
+            <motion.h3
+              className="text-2xl md:text-3xl font-bold font-serif text-gray-900 transition-colors duration-500"
+              whileHover={{ scale: 1.02 }}
+            >
+              {collection.title}
+            </motion.h3>
+
+            <p className="text-gray-600 transition-colors duration-500 leading-relaxed">
+              {collection.tagline}
+            </p>
+
+            <motion.div
+              className="flex items-center font-semibold text-gray-900 transition-colors duration-500 pt-2"
+              whileHover={{ x: 4 }}
+            >
+              <span className="mr-2 tracking-wide">EXPLORE</span>
+              <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-2" />
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Hover background effect */}
+        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 rounded-2xl" />
+      </Link>
+    </motion.div>
+  );
+};
+
+// Main component
+const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ className = '' }) => {
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+
+  // Collections data with proper typing
+  const collections: Collection[] = [
     {
+      id: 'Kids Collection',
       title: 'Kids Collection',
       tagline: 'Fun & durable bags for young explorers',
-      image: './images/kids-collection.jpg',
-      href: '/collections/kids-collection'
+      image: '/images/kids-collection.jpg',
+      href: '/collections/kids-collection',
+      priority: true
     },
     {
+      id: 'New Arrivals',
       title: 'New Arrivals',
       tagline: 'Fresh styles just landed',
-      image: './images/new-arrivals.jpg',
+      image: '/images/new-arrivals.jpg',
       href: '/collections/new-arrivals'
     },
     {
+      id: 'Everyday Backpacks',
       title: 'Everyday Backpacks',
       tagline: 'Your reliable daily companion',
-      image: './images/everyday-bag.jpg',
+      image: '/images/everyday-bag.jpg',
       href: '/collections/everyday-backpacks'
     }
   ];
 
+  const handleImageError = (collectionId: string) => {
+    setFailedImages(prev => new Set(prev).add(collectionId));
+  };
+
   return (
-    <section className="py-20 bg-white">
+    <section className={`py-16 md:py-24 bg-gradient-to-b from-white to-gray-50 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold font-serif mb-4">
+        {/* Header */}
+        <motion.div
+          className="text-center mb-12 md:mb-20"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold font-serif mb-6 text-gray-900 tracking-tight">
             Featured Collections
           </h2>
-          <p className="text-gray-600 text-lg">Discover our signature ranges</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <p className="text-gray-600 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+            Discover our signature ranges crafted for every journey
+          </p>
+        </motion.div>
+
+        {/* Collections Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
           {collections.map((collection, index) => (
-            <Link
-              key={index}
-              href={collection.href}
-              className="block border-2 border-black bg-white group hover:bg-black hover:text-white transition-all duration-300 cursor-pointer"
-            >
-              <div className="p-8">
-                <div className="aspect-square mb-6 overflow-hidden">
-                  <img
-                    src={collection.image}
-                    alt={collection.title}
-                    width={600}
-                    height={600}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
-                <h3 className="text-2xl font-bold font-serif mb-3">
-                  {collection.title}
-                </h3>
-                <p className="text-gray-600 group-hover:text-gray-300 mb-6">
-                  {collection.tagline}
-                </p>
-                <div className="flex items-center font-semibold">
-                  <span className="mr-2">Explore</span>
-                  <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </div>
-              </div>
-            </Link>
+            <CollectionCard
+              key={collection.id}
+              collection={collection}
+              index={index}
+              onImageError={handleImageError}
+            />
           ))}
         </div>
+
+        {/* Call to Action */}
+        <motion.div
+          className="text-center mt-16 md:mt-20"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          <Link
+            href="/collections"
+            className="inline-flex items-center px-8 py-4 bg-black text-white font-semibold rounded-full hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-black/20"
+          >
+            <span className="mr-2">VIEW ALL COLLECTIONS</span>
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+        </motion.div>
       </div>
     </section>
   );
