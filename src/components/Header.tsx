@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu as MenuIcon, X, User, ShoppingBag, ChevronDown, LogOut, UserCircle } from "lucide-react";
 import { useCart } from "./context/CartContext";
+import { usePathname } from "next/navigation";
 
 interface NavigationProps {
   isScrolled: boolean;
@@ -14,15 +15,30 @@ const navItems = [
   { name: "HOME", href: "/" },
   { name: "SHOP", href: "/shop" },
   { name: "COLLECTIONS", href: "/collections" },
-  { name: "ABOUT", href: "/about" },
-  { name: "CONTACT", href: "/contact" }
+  { name: "ABOUT", href: "/about-us" },
+  { name: "CONTACT", href: "/contact-us" }
 ];
 
 const Navigation: React.FC<NavigationProps> = ({ isScrolled }) => {
+
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const solidNav = !isHome || isScrolled;
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const { totalCount } = useCart();
+
+  useEffect(() => {
+    if (mobileOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+  }, [mobileOpen]);
 
   // On mount, read userId from localStorage
   useEffect(() => {
@@ -52,6 +68,11 @@ const Navigation: React.FC<NavigationProps> = ({ isScrolled }) => {
     }
   }, [profileOpen]);
 
+  useEffect(() => {
+    setMobileOpen(false);
+    setProfileOpen(false);
+  }, [pathname]);
+
   const handleSignOut = () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("token");
@@ -63,15 +84,15 @@ const Navigation: React.FC<NavigationProps> = ({ isScrolled }) => {
 
   return (
     <>
+    {!mobileOpen && (
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.3 }}
-        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          isScrolled 
-            ? "bg-black/95 backdrop-blur-md shadow-lg border-b border-white/10" 
-            : "bg-transparent"
-        }`}
+        className={`fixed top-0 w-full z-50 transition-all duration-500 ${solidNav
+          ? "bg-black/95 backdrop-blur-md shadow-lg border-b border-white/10"
+          : "bg-transparent"
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
@@ -80,11 +101,15 @@ const Navigation: React.FC<NavigationProps> = ({ isScrolled }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Link 
-                href="/" 
+              <Link
+                href="/"
                 className="text-2xl font-bold text-white tracking-wider hover:text-gray-200 transition-colors duration-200"
               >
-                SARIT
+                <img
+                  src="/images/Logo.jpeg"
+                  alt="Zexa Store logo"
+                  className="h-20 w-auto mb-3"
+                />
               </Link>
             </motion.div>
 
@@ -124,9 +149,9 @@ const Navigation: React.FC<NavigationProps> = ({ isScrolled }) => {
                   >
                     <UserCircle size={20} />
                     <span className="text-sm font-medium max-w-20 truncate">{userId}</span>
-                    <ChevronDown 
-                      size={16} 
-                      className={`transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`} 
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`}
                     />
                   </motion.button>
 
@@ -211,6 +236,7 @@ const Navigation: React.FC<NavigationProps> = ({ isScrolled }) => {
           </div>
         </div>
       </motion.nav>
+    )}
 
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
@@ -233,12 +259,16 @@ const Navigation: React.FC<NavigationProps> = ({ isScrolled }) => {
               <div className="flex flex-col h-full">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                  <Link 
-                    href="/" 
+                  <Link
+                    href="/"
                     onClick={closeMobileMenu}
                     className="text-2xl font-bold text-black"
                   >
-                    SARIT
+                    <img
+                      src="/images/Logo.jpeg"
+                      alt="Zexa Store logo"
+                      className="h-20 w-auto mb-3"
+                    />
                   </Link>
                   <motion.button
                     whileHover={{ scale: 1.1 }}

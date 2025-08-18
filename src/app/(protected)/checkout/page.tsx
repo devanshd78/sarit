@@ -22,18 +22,18 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import OrderSummary from "@/components/OrderSummary";
-import { 
-  IndianRupeeIcon, 
-  CheckCircle2, 
-  ChevronDown, 
-  ChevronUp, 
-  Shield, 
-  Truck, 
-  CreditCard, 
-  MapPin, 
-  User, 
-  Mail, 
-  Phone, 
+import {
+  IndianRupeeIcon,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Shield,
+  Truck,
+  CreditCard,
+  MapPin,
+  User,
+  Mail,
+  Phone,
   Lock,
   Save,
   AlertCircle,
@@ -42,21 +42,21 @@ import {
 import { cn } from "@/lib/utils";
 
 // Enhanced TypeScript interfaces
-interface ShippingMethod { 
-  id: string; 
-  label: string; 
-  cost: number; 
+interface ShippingMethod {
+  id: string;
+  label: string;
+  cost: number;
   estimatedDays?: string;
   description?: string;
 }
 
-interface State { 
-  _id: string; 
+interface State {
+  _id: string;
   name: string;
 }
 
-interface City { 
-  _id: string; 
+interface City {
+  _id: string;
   name: string;
 }
 
@@ -112,8 +112,8 @@ const CHECKOUT_STEPS = [
 
 // Validation rules
 const VALIDATION_RULES: Record<string, ValidationRule> = {
-  email: { 
-    required: true, 
+  email: {
+    required: true,
     pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     custom: (value) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? 'Please enter a valid email address' : undefined
   },
@@ -122,13 +122,13 @@ const VALIDATION_RULES: Record<string, ValidationRule> = {
   address: { required: true, minLength: 5 },
   city: { required: true },
   state: { required: true },
-  pin: { 
-    required: true, 
+  pin: {
+    required: true,
     pattern: /^\d{6}$/,
     custom: (value) => !/^\d{6}$/.test(value) ? 'PIN code must be 6 digits' : undefined
   },
-  phone: { 
-    required: true, 
+  phone: {
+    required: true,
     pattern: /^[\+]?[1-9][\d]{9,15}$/,
     custom: (value) => !/^[\+]?[1-9][\d]{9,15}$/.test(value) ? 'Please enter a valid phone number' : undefined
   },
@@ -198,19 +198,19 @@ const useFormField = (initialValue = '', rules?: ValidationRule) => {
 };
 
 // Progress Indicator Component
-const ProgressIndicator: FC<{ currentStep: string; completedSteps: string[] }> = ({ 
-  currentStep, 
-  completedSteps 
+const ProgressIndicator: FC<{ currentStep: string; completedSteps: string[] }> = ({
+  currentStep,
+  completedSteps
 }) => {
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between relative">
         {/* Progress Line */}
         <div className="absolute top-4 left-0 w-full h-0.5 bg-gray-200">
-          <div 
+          <div
             className="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-700 ease-out"
-            style={{ 
-              width: `${(completedSteps.length / (CHECKOUT_STEPS.length - 1)) * 100}%` 
+            style={{
+              width: `${(completedSteps.length / (CHECKOUT_STEPS.length - 1)) * 100}%`
             }}
           />
         </div>
@@ -237,7 +237,7 @@ const ProgressIndicator: FC<{ currentStep: string; completedSteps: string[] }> =
                   <Icon size={16} />
                 )}
               </div>
-              
+
               <div className="mt-2 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <p className={cn(
                   "text-xs font-medium",
@@ -286,7 +286,7 @@ const EnhancedInput: FC<{
           </Tooltip>
         )}
       </div>
-      
+
       <div className="relative">
         {Icon && (
           <Icon size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -309,7 +309,7 @@ const EnhancedInput: FC<{
           <CheckCircle2 size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" />
         )}
       </div>
-      
+
       {field.touched && field.error && (
         <div className="flex items-center gap-1 text-red-600 text-sm animate-in slide-in-from-top-1 duration-200">
           <AlertCircle size={14} />
@@ -330,7 +330,7 @@ const AutoSaveIndicator: FC<{ saving: boolean; saved: boolean }> = ({ saving, sa
       </div>
     );
   }
-  
+
   if (saved) {
     return (
       <div className="flex items-center gap-2 text-green-600 text-sm animate-in fade-in duration-500">
@@ -339,7 +339,7 @@ const AutoSaveIndicator: FC<{ saving: boolean; saved: boolean }> = ({ saving, sa
       </div>
     );
   }
-  
+
   return null;
 };
 
@@ -444,23 +444,23 @@ const CheckoutPage: FC = () => {
   // Update completed steps
   useEffect(() => {
     const completed: string[] = [];
-    
+
     if (email.field.valid && email.field.value) {
       completed.push('contact');
     }
-    
+
     if (firstName.field.valid && lastName.field.valid && address.field.valid && city.field.value && state.field.value && pin.field.valid) {
       completed.push('delivery');
     }
-    
+
     if (selectedShipping) {
       completed.push('shipping');
     }
-    
+
     if (paymentMethod) {
       completed.push('payment');
     }
-    
+
     setCompletedSteps(completed);
     updateCurrentStep();
   }, [email.field, firstName.field, lastName.field, address.field, city.field.value, state.field.value, pin.field, selectedShipping, paymentMethod, updateCurrentStep]);
@@ -480,7 +480,7 @@ const CheckoutPage: FC = () => {
       setCities([]);
       return;
     }
-    
+
     setLoadingCities(true);
     api.get<City[]>(`/state/${state.field.value}/cities`)
       .then(res => setCities(res.data))
@@ -490,27 +490,34 @@ const CheckoutPage: FC = () => {
 
   // Fetch shipping methods based on PIN
   useEffect(() => {
-    if (!pin.field.value || !pin.field.valid) {
-      setShippingMethods([]);
-      return;
-    }
-    
+    let cancel = false;
     setLoadingShipping(true);
-    api.get("/shipping", { params: { pin: pin.field.value } })
+    api.get("/shipping/available")
       .then(res => {
-        if (res.data.success) {
-          const methods = res.data.methods as ShippingMethod[];
-          setShippingMethods(methods);
-          const first = methods[0];
-          if (first) {
-            setSelectedShipping(first.id);
-            setShippingCost(first.cost);
+        if (cancel) return;
+        if (res?.data?.success) {
+          const methods = (res.data.items || res.data.methods) as ShippingMethod[];
+          setShippingMethods(methods || []);
+          const std = methods?.find(m => m.id === "standard");
+          const chosen = std ?? methods?.[0];
+          if (chosen) {
+            setSelectedShipping(prev => prev || chosen.id);
+            setShippingCost(chosen.cost);
           }
+        } else {
+          setShippingMethods([]);
         }
       })
-      .catch(console.error)
-      .finally(() => setLoadingShipping(false));
-  }, [pin.field.value, pin.field.valid, setShippingCost]);
+      .catch(() => setShippingMethods([]))
+      .finally(() => { if (!cancel) setLoadingShipping(false); });
+    return () => { cancel = true; };
+  }, [setShippingCost]);
+
+  // Keep shipping cost in sync with selection
+  useEffect(() => {
+    if (!selectedShipping || shippingMethods.length === 0) return; const m = shippingMethods.find(m => m.id === selectedShipping);
+    if (m) setShippingCost(m.cost);
+  }, [selectedShipping, shippingMethods, setShippingCost]);
 
   // Section management
   const toggleSection = useCallback((section: keyof typeof sectionsOpen) => {
@@ -520,7 +527,7 @@ const CheckoutPage: FC = () => {
   // Form validation
   const validate = useCallback(() => {
     const errs: string[] = [];
-    
+
     if (!email.field.valid || !email.field.value) errs.push("Valid email is required");
     if (!firstName.field.valid || !firstName.field.value) errs.push("First name is required");
     if (!lastName.field.valid || !lastName.field.value) errs.push("Last name is required");
@@ -530,14 +537,14 @@ const CheckoutPage: FC = () => {
     if (!pin.field.valid || !pin.field.value) errs.push("Valid PIN code is required");
     if (!phone.field.valid || !phone.field.value) errs.push("Valid phone number is required");
     if (!selectedShipping) errs.push("Please select a shipping method");
-    
+
     if (!billingSame) {
       if (!billing.address.value) errs.push("Billing address is required");
       if (!billing.city.value) errs.push("Billing city is required");
       if (!billing.state.value) errs.push("Billing state is required");
       if (!billing.pin.value) errs.push("Billing PIN code is required");
     }
-    
+
     setErrors(errs);
     return errs.length === 0;
   }, [email.field, firstName.field, lastName.field, address.field, city.field.value, state.field.value, pin.field, phone.field, selectedShipping, billingSame, billing]);
@@ -545,7 +552,7 @@ const CheckoutPage: FC = () => {
   // Form submission
   const handleSubmit = useCallback(async () => {
     if (!validate()) return;
-    
+
     setSubmitting(true);
 
     const payloadForm = {
@@ -586,7 +593,6 @@ const CheckoutPage: FC = () => {
         items: payloadItems,
         form: payloadForm,
         shippingId: selectedShipping,
-        shippingCost,
         coupon: coupon ? { code: coupon.code } : undefined,
         billingAddress: payloadBilling,
       });
@@ -608,14 +614,14 @@ const CheckoutPage: FC = () => {
   // Memoized values for performance
   const isFormValid = useMemo(() => {
     return email.field.valid && email.field.value &&
-           firstName.field.valid && firstName.field.value &&
-           lastName.field.valid && lastName.field.value &&
-           address.field.valid && address.field.value &&
-           city.field.value && state.field.value &&
-           pin.field.valid && pin.field.value &&
-           phone.field.valid && phone.field.value &&
-           selectedShipping &&
-           (billingSame || (billing.address.value && billing.city.value && billing.state.value && billing.pin.value));
+      firstName.field.valid && firstName.field.value &&
+      lastName.field.valid && lastName.field.value &&
+      address.field.valid && address.field.value &&
+      city.field.value && state.field.value &&
+      pin.field.valid && pin.field.value &&
+      phone.field.valid && phone.field.value &&
+      selectedShipping &&
+      (billingSame || (billing.address.value && billing.city.value && billing.state.value && billing.pin.value));
   }, [email.field, firstName.field, lastName.field, address.field, city.field.value, state.field.value, pin.field, phone.field, selectedShipping, billingSame, billing]);
 
   return (
@@ -661,8 +667,8 @@ const CheckoutPage: FC = () => {
 
               {/* Contact Section */}
               <Card className="shadow-sm hover:shadow-md transition-all duration-300 border-l-4 border-l-blue-500">
-                <Collapsible 
-                  open={sectionsOpen.contact} 
+                <Collapsible
+                  open={sectionsOpen.contact}
                   onOpenChange={() => toggleSection('contact')}
                 >
                   <CollapsibleTrigger asChild>
@@ -689,7 +695,7 @@ const CheckoutPage: FC = () => {
                       </div>
                     </CardHeader>
                   </CollapsibleTrigger>
-                  
+
                   <CollapsibleContent>
                     <CardContent className="space-y-4">
                       <div className="grid gap-4 md:grid-cols-2">
@@ -704,12 +710,12 @@ const CheckoutPage: FC = () => {
                           helpText="We'll send order updates to this email"
                           required
                         />
-                        
+
                         <div className="flex items-center space-x-2 mt-8">
-                          <Checkbox 
-                            id="subscribe" 
-                            checked={subscribe} 
-                            onCheckedChange={() => setSubscribe}
+                          <Checkbox
+                            id="subscribe"
+                            checked={subscribe}
+                            onCheckedChange={(checked) => setSubscribe(!!checked)}
                           />
                           <Label htmlFor="subscribe" className="text-sm">
                             Subscribe to newsletter for exclusive offers
@@ -723,8 +729,8 @@ const CheckoutPage: FC = () => {
 
               {/* Delivery Address Section */}
               <Card className="shadow-sm hover:shadow-md transition-all duration-300 border-l-4 border-l-purple-500">
-                <Collapsible 
-                  open={sectionsOpen.delivery} 
+                <Collapsible
+                  open={sectionsOpen.delivery}
                   onOpenChange={() => toggleSection('delivery')}
                 >
                   <CollapsibleTrigger asChild>
@@ -751,7 +757,7 @@ const CheckoutPage: FC = () => {
                       </div>
                     </CardHeader>
                   </CollapsibleTrigger>
-                  
+
                   <CollapsibleContent>
                     <CardContent className="space-y-6">
                       <div className="grid gap-4 md:grid-cols-2">
@@ -764,7 +770,7 @@ const CheckoutPage: FC = () => {
                           icon={User}
                           required
                         />
-                        
+
                         <EnhancedInput
                           field={lastName.field}
                           onChange={lastName.setValue}
@@ -786,7 +792,7 @@ const CheckoutPage: FC = () => {
                           icon={MapPin}
                           required
                         />
-                        
+
                         <EnhancedInput
                           field={apartment.field}
                           onChange={apartment.setValue}
@@ -811,7 +817,7 @@ const CheckoutPage: FC = () => {
                               )}>
                                 <SelectValue placeholder="Select state" />
                               </SelectTrigger>
-                              <SelectContent>
+                              <SelectContent className="bg-white">
                                 {states.map(s => (
                                   <SelectItem key={s._id} value={s._id}>
                                     {s.name}
@@ -829,8 +835,8 @@ const CheckoutPage: FC = () => {
                           {loadingCities ? (
                             <Skeleton className="h-10" />
                           ) : (
-                            <Select 
-                              value={city.field.value} 
+                            <Select
+                              value={city.field.value}
                               onValueChange={city.setValue}
                               disabled={!cities.length}
                             >
@@ -840,7 +846,7 @@ const CheckoutPage: FC = () => {
                               )}>
                                 <SelectValue placeholder="Select city" />
                               </SelectTrigger>
-                              <SelectContent>
+                              <SelectContent className="bg-white">
                                 {cities.map(c => (
                                   <SelectItem key={c._id} value={c._id}>
                                     {c.name}
@@ -880,8 +886,8 @@ const CheckoutPage: FC = () => {
 
               {/* Shipping Method Section */}
               <Card className="shadow-sm hover:shadow-md transition-all duration-300 border-l-4 border-l-green-500">
-                <Collapsible 
-                  open={sectionsOpen.shipping} 
+                <Collapsible
+                  open={sectionsOpen.shipping}
                   onOpenChange={() => toggleSection('shipping')}
                 >
                   <CollapsibleTrigger asChild>
@@ -908,7 +914,7 @@ const CheckoutPage: FC = () => {
                       </div>
                     </CardHeader>
                   </CollapsibleTrigger>
-                  
+
                   <CollapsibleContent>
                     <CardContent>
                       {loadingShipping ? (
@@ -928,8 +934,8 @@ const CheckoutPage: FC = () => {
                           className="space-y-3"
                         >
                           {shippingMethods.map(method => (
-                            <div 
-                              key={method.id} 
+                            <div
+                              key={method.id}
                               className={cn(
                                 "flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-all duration-200",
                                 "hover:border-blue-300 hover:bg-blue-50",
@@ -961,18 +967,11 @@ const CheckoutPage: FC = () => {
                             </div>
                           ))}
                         </RadioGroup>
-                      ) : pin.field.valid && pin.field.value ? (
+                      ) : (
                         <Alert>
                           <AlertCircle className="h-4 w-4" />
                           <AlertDescription>
-                            No shipping options available for this PIN code. Please check your PIN code or try a different address.
-                          </AlertDescription>
-                        </Alert>
-                      ) : (
-                        <Alert>
-                          <Info className="h-4 w-4" />
-                          <AlertDescription>
-                            Please enter a valid PIN code to see shipping options.
+                            Shipping methods are not available right now. Please try again in a moment.
                           </AlertDescription>
                         </Alert>
                       )}
@@ -983,8 +982,8 @@ const CheckoutPage: FC = () => {
 
               {/* Payment Method Section */}
               <Card className="shadow-sm hover:shadow-md transition-all duration-300 border-l-4 border-l-orange-500">
-                <Collapsible 
-                  open={sectionsOpen.payment} 
+                <Collapsible
+                  open={sectionsOpen.payment}
                   onOpenChange={() => toggleSection('payment')}
                 >
                   <CollapsibleTrigger asChild>
@@ -1011,7 +1010,7 @@ const CheckoutPage: FC = () => {
                       </div>
                     </CardHeader>
                   </CollapsibleTrigger>
-                  
+
                   <CollapsibleContent>
                     <CardContent>
                       <RadioGroup
@@ -1024,7 +1023,7 @@ const CheckoutPage: FC = () => {
                           "hover:border-blue-300 hover:bg-blue-50",
                           paymentMethod === "gateway" && "border-blue-500 bg-blue-50"
                         )}
-                        onClick={() => setPaymentMethod("gateway")}
+                          onClick={() => setPaymentMethod("gateway")}
                         >
                           <RadioGroupItem value="gateway" className="mt-1 mr-4" />
                           <div className="flex-1">
@@ -1050,7 +1049,7 @@ const CheckoutPage: FC = () => {
                           "hover:border-blue-300 hover:bg-blue-50",
                           paymentMethod === "cod" && "border-blue-500 bg-blue-50"
                         )}
-                        onClick={() => setPaymentMethod("cod")}
+                          onClick={() => setPaymentMethod("cod")}
                         >
                           <RadioGroupItem value="cod" className="mr-4" />
                           <div>
@@ -1066,8 +1065,8 @@ const CheckoutPage: FC = () => {
 
               {/* Billing Address Section */}
               <Card className="shadow-sm hover:shadow-md transition-all duration-300 border-l-4 border-l-indigo-500">
-                <Collapsible 
-                  open={sectionsOpen.billing} 
+                <Collapsible
+                  open={sectionsOpen.billing}
                   onOpenChange={() => toggleSection('billing')}
                 >
                   <CollapsibleTrigger asChild>
@@ -1086,14 +1085,14 @@ const CheckoutPage: FC = () => {
                       </div>
                     </CardHeader>
                   </CollapsibleTrigger>
-                  
+
                   <CollapsibleContent>
                     <CardContent className="space-y-4">
                       <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="billingSame" 
-                          checked={billingSame} 
-                          onCheckedChange={() => setBillingSame}
+                        <Checkbox
+                          id="billingSame"
+                          checked={billingSame}
+                          onCheckedChange={(checked) => setBillingSame(!!checked)}
                         />
                         <Label htmlFor="billingSame" className="font-medium">
                           Same as delivery address
@@ -1105,10 +1104,10 @@ const CheckoutPage: FC = () => {
                           <div className="grid gap-4 md:grid-cols-2">
                             <div>
                               <Label htmlFor="billFirst">First name</Label>
-                              <Input 
-                                id="billFirst" 
-                                placeholder="John" 
-                                value={billing.firstName.value} 
+                              <Input
+                                id="billFirst"
+                                placeholder="John"
+                                value={billing.firstName.value}
                                 onChange={(e) => setBilling(prev => ({
                                   ...prev,
                                   firstName: { ...prev.firstName, value: e.target.value }
@@ -1117,10 +1116,10 @@ const CheckoutPage: FC = () => {
                             </div>
                             <div>
                               <Label htmlFor="billLast">Last name</Label>
-                              <Input 
-                                id="billLast" 
-                                placeholder="Doe" 
-                                value={billing.lastName.value} 
+                              <Input
+                                id="billLast"
+                                placeholder="Doe"
+                                value={billing.lastName.value}
                                 onChange={(e) => setBilling(prev => ({
                                   ...prev,
                                   lastName: { ...prev.lastName, value: e.target.value }
@@ -1131,10 +1130,10 @@ const CheckoutPage: FC = () => {
 
                           <div>
                             <Label htmlFor="billAddr">Address</Label>
-                            <Input 
-                              id="billAddr" 
-                              placeholder="123 Main St" 
-                              value={billing.address.value} 
+                            <Input
+                              id="billAddr"
+                              placeholder="123 Main St"
+                              value={billing.address.value}
                               onChange={(e) => setBilling(prev => ({
                                 ...prev,
                                 address: { ...prev.address, value: e.target.value }
@@ -1145,9 +1144,9 @@ const CheckoutPage: FC = () => {
                           <div className="grid gap-4 md:grid-cols-3">
                             <div>
                               <Label htmlFor="billState">State</Label>
-                              <Input 
-                                id="billState" 
-                                value={billing.state.value} 
+                              <Input
+                                id="billState"
+                                value={billing.state.value}
                                 onChange={(e) => setBilling(prev => ({
                                   ...prev,
                                   state: { ...prev.state, value: e.target.value }
@@ -1156,9 +1155,9 @@ const CheckoutPage: FC = () => {
                             </div>
                             <div>
                               <Label htmlFor="billCity">City</Label>
-                              <Input 
-                                id="billCity" 
-                                value={billing.city.value} 
+                              <Input
+                                id="billCity"
+                                value={billing.city.value}
                                 onChange={(e) => setBilling(prev => ({
                                   ...prev,
                                   city: { ...prev.city, value: e.target.value }
@@ -1167,9 +1166,9 @@ const CheckoutPage: FC = () => {
                             </div>
                             <div>
                               <Label htmlFor="billPin">PIN code</Label>
-                              <Input 
-                                id="billPin" 
-                                value={billing.pin.value} 
+                              <Input
+                                id="billPin"
+                                value={billing.pin.value}
                                 onChange={(e) => setBilling(prev => ({
                                   ...prev,
                                   pin: { ...prev.pin, value: e.target.value }
@@ -1180,10 +1179,10 @@ const CheckoutPage: FC = () => {
 
                           <div>
                             <Label htmlFor="billPhone">Phone</Label>
-                            <Input 
-                              id="billPhone" 
-                              placeholder="+91 98765 43210" 
-                              value={billing.phone.value} 
+                            <Input
+                              id="billPhone"
+                              placeholder="+91 98765 43210"
+                              value={billing.phone.value}
                               onChange={(e) => setBilling(prev => ({
                                 ...prev,
                                 phone: { ...prev.phone, value: e.target.value }
@@ -1199,8 +1198,8 @@ const CheckoutPage: FC = () => {
 
               {/* Submit Button */}
               <div className="sticky bottom-4 z-10">
-                <Button 
-                  onClick={handleSubmit} 
+                <Button
+                  onClick={handleSubmit}
                   disabled={submitting || !isFormValid}
                   className={cn(
                     "w-full py-6 text-lg font-semibold transition-all duration-300",

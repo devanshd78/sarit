@@ -109,7 +109,7 @@ export default function ContactPage() {
           <ul className="space-y-4">
             <li className="flex items-center space-x-2">
               <Mail className="w-5 h-5" />
-              <span>support@sarit.com</span>
+              <span>support@Zexa Store.com</span>
             </li>
             <li className="flex items-center space-x-2">
               <Phone className="w-5 h-5" />
@@ -117,7 +117,7 @@ export default function ContactPage() {
             </li>
             <li className="flex items-center space-x-2">
               <MapPin className="w-5 h-5" />
-              <span>123 Sarit Street, Mumbai, India</span>
+              <span>123 Zexa Store Street, Mumbai, India</span>
             </li>
           </ul>
         </div>

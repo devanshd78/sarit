@@ -25,8 +25,8 @@ const sections = [
     icon: LayoutDashboard,
     submenu: [
       { label: 'Slides', href: '/admin/front-page/slides' },
-      // { label: 'Collections', href: '/admin/front-page/collections' },
-      { label: 'Best Sellers', href: '/admin/front-page/best-sellers' },
+      { label: 'Collections', href: '/admin/front-page/collections' },
+      // { label: 'Best Sellers', href: '/admin/front-page/best-sellers' },
       { label: 'Testimonials', href: '/admin/front-page/testimonials' },
     ],
   },

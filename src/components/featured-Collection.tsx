@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
+'use client';
+
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Loader2 } from 'lucide-react';
 
-// TypeScript interfaces for type safety
+// ---------- types ----------
+interface ApiCollection {
+  _id: string;
+  title: string;
+  subtitle: string;
+  href: string;
+  image: string; // data URI from API
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface Collection {
   id: string;
   title: string;
@@ -18,19 +30,18 @@ interface FeaturedCollectionsProps {
   className?: string;
 }
 
-// Loading skeleton component
+// ---------- UI bits ----------
 const CollectionSkeleton: React.FC = () => (
   <div className="border-2 border-gray-200 bg-white rounded-2xl overflow-hidden animate-pulse">
     <div className="p-6 md:p-8">
-      <div className="aspect-square mb-6 bg-gray-200 rounded-xl"></div>
-      <div className="h-8 bg-gray-200 rounded mb-3"></div>
-      <div className="h-4 bg-gray-200 rounded mb-6 w-3/4"></div>
-      <div className="h-6 bg-gray-200 rounded w-24"></div>
+      <div className="aspect-square mb-6 bg-gray-200 rounded-xl" />
+      <div className="h-8 bg-gray-200 rounded mb-3" />
+      <div className="h-4 bg-gray-200 rounded mb-6 w-3/4" />
+      <div className="h-6 bg-gray-200 rounded w-24" />
     </div>
   </div>
 );
 
-// Error fallback component
 const CollectionError: React.FC<{ onRetry?: () => void }> = ({ onRetry }) => (
   <div className="border-2 border-red-200 bg-red-50 rounded-2xl p-6 md:p-8 text-center">
     <div className="text-red-600 mb-4">
@@ -51,7 +62,6 @@ const CollectionError: React.FC<{ onRetry?: () => void }> = ({ onRetry }) => (
   </div>
 );
 
-// Individual collection card component
 const CollectionCard: React.FC<{
   collection: Collection;
   index: number;
@@ -66,19 +76,15 @@ const CollectionCard: React.FC<{
     onImageError(collection.id);
   };
 
-  const handleImageLoad = () => {
-    setImageLoading(false);
-  };
+  const handleImageLoad = () => setImageLoading(false);
 
-  if (imageError) {
-    return <CollectionError />;
-  }
+  if (imageError) return <CollectionError />;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      transition={{ duration: 0.5, delay: index * 0.08 }}
       whileHover={{ y: -8 }}
       className="group"
     >
@@ -88,7 +94,6 @@ const CollectionCard: React.FC<{
         aria-label={`Explore ${collection.title} collection - ${collection.tagline}`}
       >
         <div className="p-6 md:p-8">
-          {/* Image Container with Loading State */}
           <div className="relative aspect-square mb-6 overflow-hidden rounded-xl bg-gray-100">
             <AnimatePresence>
               {imageLoading && (
@@ -106,21 +111,18 @@ const CollectionCard: React.FC<{
               src={collection.image}
               alt={`${collection.title} collection featuring ${collection.tagline.toLowerCase()}`}
               fill
-              className={`object-cover transition-all duration-700 ease-out group-hover:scale-110 ${imageLoading ? 'opacity-0' : 'opacity-100'
-                }`}
+              className={`object-cover transition-all duration-700 ease-out group-hover:scale-110 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               priority={collection.priority}
               onLoad={handleImageLoad}
               onError={handleImageError}
-              placeholder="blur"
-              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+              // Using data URIs from API works fine with next/image.
+              // If you switch to streaming endpoint URLs, consider `unoptimized` or configuring next.config images.
             />
 
-            {/* Overlay gradient for better text readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           </div>
 
-          {/* Content */}
           <div className="space-y-3">
             <motion.h3
               className="text-2xl md:text-3xl font-bold font-serif text-gray-900 transition-colors duration-500"
@@ -143,46 +145,68 @@ const CollectionCard: React.FC<{
           </div>
         </div>
 
-        {/* Hover background effect */}
         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 rounded-2xl" />
       </Link>
     </motion.div>
   );
 };
 
-// Main component
+// ---------- Main ----------
 const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ className = '' }) => {
+  const [items, setItems] = useState<ApiCollection[] | null>(null);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Collections data with proper typing
-  const collections: Collection[] = [
-    {
-      id: 'Kids Collection',
-      title: 'Kids Collection',
-      tagline: 'Fun & durable bags for young explorers',
-      image: '/images/kids-collection.jpg',
-      href: '/collections/kids-collection',
-      priority: true
-    },
-    {
-      id: 'New Arrivals',
-      title: 'New Arrivals',
-      tagline: 'Fresh styles just landed',
-      image: '/images/new-arrivals.jpg',
-      href: '/collections/new-arrivals'
-    },
-    {
-      id: 'Everyday Backpacks',
-      title: 'Everyday Backpacks',
-      tagline: 'Your reliable daily companion',
-      image: '/images/everyday-bag.jpg',
-      href: '/collections/everyday-backpacks'
-    }
-  ];
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? ''; // leave empty if same origin
+  const endpoint = `${API_BASE}/collections/getlist`;
 
-  const handleImageError = (collectionId: string) => {
-    setFailedImages(prev => new Set(prev).add(collectionId));
+  const fetchData = useCallback(() => {
+    const controller = new AbortController();
+    setLoading(true);
+    setError(null);
+
+    fetch(endpoint, { signal: controller.signal, headers: { 'Accept': 'application/json' } })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (!data?.success) throw new Error('API returned an error shape');
+        setItems(Array.isArray(data.items) ? data.items : []);
+      })
+      .catch((err) => {
+        if (err.name !== 'AbortError') setError(err.message || 'Failed to fetch');
+      })
+      .finally(() => setLoading(false));
+
+    return () => controller.abort();
+  }, [endpoint]);
+
+  useEffect(() => {
+    const abort = fetchData();
+    return abort;
+  }, [fetchData]);
+
+  const handleImageError = (id: string) => {
+    setFailedImages((prev) => new Set(prev).add(id));
   };
+
+  const uiCollections: Collection[] = useMemo(() => {
+    if (!items) return [];
+    return items
+      .map((x) => ({
+        id: x._id,
+        title: x.title,
+        tagline: x.subtitle,
+        image: x.image, // data URI
+        href: x.href,
+      }))
+      // optional: prioritize first 3 most recent
+      .sort((a, b) => {
+        const A = items.find((i) => i._id === a.id)?.createdAt ?? '';
+        const B = items.find((i) => i._id === b.id)?.createdAt ?? '';
+        return new Date(B).getTime() - new Date(A).getTime();
+      });
+  }, [items]);
 
   return (
     <section className={`py-16 md:py-24 bg-gradient-to-b from-white to-gray-50 ${className}`}>
@@ -202,24 +226,42 @@ const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ className = '
           </p>
         </motion.div>
 
-        {/* Collections Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
-          {collections.map((collection, index) => (
-            <CollectionCard
-              key={collection.id}
-              collection={collection}
-              index={index}
-              onImageError={handleImageError}
-            />
-          ))}
-        </div>
+        {/* Loading / Error / Grid */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
+            {[...Array(3)].map((_, i) => (
+              <CollectionSkeleton key={i} />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="max-w-md mx-auto">
+            <CollectionError onRetry={fetchData} />
+          </div>
+        ) : (
+          <>
+            {uiCollections.length === 0 ? (
+              <div className="text-center text-gray-600">No collections yet.</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
+                {uiCollections.map((collection, index) => (
+                  <CollectionCard
+                    key={collection.id}
+                    collection={collection}
+                    index={index}
+                    onImageError={handleImageError}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
 
-        {/* Call to Action */}
+        {/* CTA */}
         <motion.div
           className="text-center mt-16 md:mt-20"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
         >
           <Link
             href="/collections"
