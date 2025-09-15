@@ -1,12 +1,12 @@
 "use client";
 
 import { Suspense } from "react";
-import AddUpdateBagCollection from "./AddUpdate";
+import CollectionsPage from "../CollectionsPage";
 
 export default function Page() {
   return (
     <Suspense fallback={<div className="p-6">Loading…</div>}>
-      <AddUpdateBagCollection />
+      <CollectionsPage />
     </Suspense>
   );
 }
