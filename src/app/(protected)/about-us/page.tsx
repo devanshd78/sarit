@@ -10,7 +10,6 @@ import {
   Shield, 
   Leaf, 
   Star,
-  CheckCircle,
   ArrowRight
 } from 'lucide-react';
 
