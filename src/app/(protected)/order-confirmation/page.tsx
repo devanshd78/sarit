@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-  CardFooter,
 } from "@/components/ui/card";
 import {
   Table,
@@ -237,7 +236,7 @@ const ErrorDisplay: FC<{ error: string; onRetry: () => void }> = ({ error, onRet
   </motion.div>
 );
 
-export const OrderConfirmationPage: FC = () => {
+const OrderConfirmationPage: FC = () => {
   const params = useSearchParams();
   const orderId = params.get("orderId") ?? "";
 
